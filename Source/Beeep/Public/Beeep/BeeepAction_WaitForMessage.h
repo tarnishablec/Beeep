@@ -11,7 +11,7 @@
 
 struct FInstancedStruct;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBeeepWaitForMessageDelegate, FGameplayTag, Channel,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBeeepWaitForMessageDelegate, FGameplayTag, ActualChannel,
                                              const FInstancedStruct&, Payload);
 
 /**
