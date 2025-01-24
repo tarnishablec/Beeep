@@ -40,6 +40,7 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
 {
     struct FInvalidLocation
     {
+        FChannelListenerList* InvalidList;
         FGameplayTag InvalidChannel;
         int32 Index;
     };
@@ -49,7 +50,7 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
     bool bOnInitialTag = true;
     for (auto Tag = Channel; Tag.IsValid(); Tag = Tag.RequestDirectParent())
     {
-        if (const auto* ListenerList = ListenerMap.Find(Tag))
+        if (auto* ListenerList = ListenerMap.Find(Tag))
         {
             for (int i = 0; i < ListenerList->Listeners.Num(); ++i)
             {
@@ -63,7 +64,7 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
                 }
                 else
                 {
-                    InvalidLocations.Add({Tag, i});
+                    InvalidLocations.Add({ListenerList, Tag, i});
                 }
             }
         }
@@ -71,14 +72,13 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
         bOnInitialTag = false;
     }
 
-    for (auto& [InvalidChannel, Index] : InvalidLocations)
+    for (auto& [InvalidList,InvalidChannel, Index] : InvalidLocations)
     {
-        const auto ListenerList = ListenerMap.Find(InvalidChannel);
-        if (ListenerList)
+        if (InvalidList)
         {
-            ListenerList->Listeners.RemoveAtSwap(Index);
+            InvalidList->Listeners.RemoveAtSwap(Index);
 
-            if (ListenerList->Listeners.Num() == 0)
+            if (InvalidList->Listeners.Num() == 0)
             {
                 ListenerMap.Remove(InvalidChannel);
             }
@@ -121,10 +121,6 @@ void UBeeepMessageSubsystem::UnregisterListener(const FBeeepMessageListenerHandl
         if (MatchedIndex != INDEX_NONE)
         {
             ListenerList->Listeners[MatchedIndex].MarkAsDead();
-        }
-        if (ListenerList->Listeners.Num() == 0)
-        {
-            ListenerMap.Remove(Handle.Channel);
         }
     }
 }
