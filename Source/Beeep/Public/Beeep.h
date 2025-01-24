@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FBeeepModule : public IModuleInterface
+class FBeeepModule final : public IModuleInterface
 {
 public:
 
