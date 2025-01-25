@@ -1,6 +1,5 @@
 ﻿// Copyright 2019-Present tarnishablec. All Rights Reserved.
 
-
 #include "Beeep/BeeepMessageSubsystem.h"
 
 #include "GameplayTagContainer.h"
@@ -45,7 +44,10 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
         int32 Index;
     };
 
-    TArray<FInvalidLocation> InvalidLocations;
+    check(Channel.IsValid());
+
+    using FInvalidLocationNodeType = TSharedPtr<FInvalidLocation>;
+    TLinkedList<FInvalidLocationNodeType>* InvalidLocationsStart = nullptr;
 
     bool bOnInitialTag = true;
     for (auto Tag = Channel; Tag.IsValid(); Tag = Tag.RequestDirectParent())
@@ -64,7 +66,10 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
                 }
                 else
                 {
-                    InvalidLocations.Add({ListenerList, Tag, i});
+                    auto InvalidLocation = MakeShared<FInvalidLocation>(ListenerList, Tag, i);
+                    auto* InvalidLocationNode = new TLinkedList<FInvalidLocationNodeType>(InvalidLocation);
+                    InvalidLocationNode->LinkHead(InvalidLocationsStart);
+                    InvalidLocationsStart = InvalidLocationNode;
                 }
             }
         }
@@ -72,17 +77,27 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
         bOnInitialTag = false;
     }
 
-    for (auto& [InvalidList,InvalidChannel, Index] : InvalidLocations)
+    if (auto* CurrentNode = InvalidLocationsStart)
     {
-        if (InvalidList)
+        while (CurrentNode)
         {
-            InvalidList->Listeners.RemoveAtSwap(Index);
+            auto* NextNode = CurrentNode->Next();
+            auto& NodeData = **CurrentNode;
 
-            if (InvalidList->Listeners.Num() == 0)
+            if (NodeData->InvalidList)
             {
-                ListenerMap.Remove(InvalidChannel);
+                NodeData->InvalidList->Listeners.RemoveAtSwap(NodeData->Index);
+                if (NodeData->InvalidList->Listeners.Num() == 0)
+                {
+                    ListenerMap.Remove(NodeData->InvalidChannel);
+                }
             }
+
+            delete CurrentNode;
+            NodeData.Reset();
+            CurrentNode = NextNode;
         }
+        InvalidLocationsStart = nullptr;
     }
 }
 
@@ -104,7 +119,7 @@ void UBeeepMessageSubsystem::RegisterListener(const FBeeepMessageListenerParams&
 
 void UBeeepMessageSubsystem::UnregisterListener(const FBeeepMessageListenerHandle& Handle)
 {
-    if (!Handle.IsValid())
+    if (!Handle.IsValid() || Handle.Subsystem != this)
     {
         return;
     }
