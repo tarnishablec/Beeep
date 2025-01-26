@@ -83,7 +83,6 @@ public:
     static UBeeepMessageSubsystem* Get(const UObject* WorldContextObject)
     {
         const auto World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::Assert);
-        check(World);
         return World->GetGameInstance()->GetSubsystem<UBeeepMessageSubsystem>();
     };
 
