@@ -1,23 +1,29 @@
 ﻿{
-	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "Beeep",
-	"Description": "",
-	"Category": "Other",
-	"CreatedBy": "tarnishablec",
-	"CreatedByURL": "tarnishablec@outlook.com",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"CanContainContent": true,
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
-	"Installed": false,
-	"Modules": [
-		{
-			"Name": "Beeep",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		}
-	]
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "Beeep",
+  "Description": "",
+  "Category": "Other",
+  "CreatedBy": "tarnishablec",
+  "CreatedByURL": "tarnishablec@outlook.com",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "Beeep",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "StructUtils",
+      "Enabled": true
+    }
+  ]
 }
