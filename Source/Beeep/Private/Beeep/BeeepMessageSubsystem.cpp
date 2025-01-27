@@ -31,6 +31,14 @@ void UBeeepMessageSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UBeeepMessageSubsystem::Deinitialize()
 {
+    for (auto&& ListenerMapEntry : ListenerMap)
+    {
+        const auto Listeners = ListenerMapEntry.Value.Listeners;
+        for (FBeeepMessageListenerHandle Listener : Listeners)
+        {
+            Listener.Unregister();
+        }
+    }
     ListenerMap.Reset();
     Super::Deinitialize();
 }
