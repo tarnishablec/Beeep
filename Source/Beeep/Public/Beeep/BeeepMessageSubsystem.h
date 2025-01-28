@@ -74,6 +74,7 @@ public:
         const FInstancedStruct& Payload = FInstancedStruct()
     );
 
+    UFUNCTION(BlueprintCallable, Category = "Beeep")
     void RegisterListener(const FBeeepMessageListenerParams& Params,
                           FBeeepMessageListenerHandle& Handle);
 

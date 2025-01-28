@@ -47,4 +47,7 @@ protected:
     TWeakObjectPtr<UWorld> WorldPtr;
     FGameplayTag ChannelToRegister;
     EBeeepChannelMatchMode ActionMatchMode;
+
+    UFUNCTION()
+    void HandleMessageReceived(FGameplayTag Channel, const FInstancedStruct& Payload);
 };

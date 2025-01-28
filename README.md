@@ -15,3 +15,6 @@ dynamic types through InstancedStruct while maintaining polymorphism.
 ### Example
 
 ![img.png](img.png)
+
+You can also register listener like below
+![img_1.png](img_1.png)

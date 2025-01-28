@@ -37,14 +37,7 @@ void UBeeepAction_WaitForMessage::Activate()
         FBeeepMessageListenerParams ListenerParams;
         ListenerParams.MatchMode = ActionMatchMode;
         ListenerParams.Channel = ChannelToRegister;
-        ListenerParams.MessageReceivedCallback =
-            [WeakThis](const FGameplayTag Channel, const FInstancedStruct& Payload)
-            {
-                if (const auto StrongThis = WeakThis.Get())
-                {
-                    StrongThis->OnMessageReceived.Broadcast(Channel, Payload);
-                }
-            };
+        ListenerParams.MessageReceived.BindDynamic(this, &UBeeepAction_WaitForMessage::HandleMessageReceived);
 
         Beeep->RegisterListener(ListenerParams, *ListenerHandle);
         return;
@@ -70,4 +63,10 @@ void UBeeepAction_WaitForMessage::Cancel()
 bool UBeeepAction_WaitForMessage::IsActive() const
 {
     return Super::IsActive();
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void UBeeepAction_WaitForMessage::HandleMessageReceived(const FGameplayTag Channel, const FInstancedStruct& Payload)
+{
+    OnMessageReceived.Broadcast(Channel, Payload);
 }

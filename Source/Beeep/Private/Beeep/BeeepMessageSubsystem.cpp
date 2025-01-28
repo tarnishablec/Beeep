@@ -69,7 +69,10 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
                 {
                     if (bOnInitialTag || Listener.MatchMode == EBeeepChannelMatchMode::PartialMatch)
                     {
-                        Listener.MessageReceivedCallback(Channel, Payload);
+                        if (Listener.MessageReceived.IsBound())
+                        {
+                            Listener.MessageReceived.Execute(Channel, Payload);
+                        }
                     }
                 }
                 else
@@ -117,7 +120,7 @@ void UBeeepMessageSubsystem::RegisterListener(const FBeeepMessageListenerParams&
 
     Entry.Channel = Params.Channel;
     Entry.MatchMode = Params.MatchMode;
-    Entry.MessageReceivedCallback = Params.MessageReceivedCallback;
+    Entry.MessageReceived = Params.MessageReceived;
     Entry.ID = ++HandleID;
     Entry.Subsystem = this;
     Entry.Dead = false;

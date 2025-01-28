@@ -24,16 +24,19 @@ enum class EBeeepChannelMatchMode : uint8
 
 using FBeeepMessageCallback = TFunction<void(FGameplayTag, const FInstancedStruct&)>;
 
-USTRUCT()
-struct FBeeepMessageListenerParams
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FBeeepMessageDelegate, FGameplayTag, Channel, const FInstancedStruct&, Payload);
+
+USTRUCT(BlueprintType)
+struct BEEEP_API FBeeepMessageListenerParams
 {
     GENERATED_BODY()
 
-    UPROPERTY(Transient)
+    UPROPERTY(Transient, BlueprintReadWrite)
     FGameplayTag Channel;
 
-    UPROPERTY(Transient)
+    UPROPERTY(Transient, BlueprintReadWrite)
     EBeeepChannelMatchMode MatchMode = EBeeepChannelMatchMode::ExactMatch;
 
-    FBeeepMessageCallback MessageReceivedCallback;
+    UPROPERTY(BlueprintReadWrite)
+    FBeeepMessageDelegate MessageReceived;
 };
