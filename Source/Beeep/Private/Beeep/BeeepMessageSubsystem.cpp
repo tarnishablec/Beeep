@@ -54,7 +54,7 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
 
     check(Channel.IsValid());
 
-    using FInvalidLocationNodeType = TSharedPtr<FInvalidLocation>;
+    using FInvalidLocationNodeType = FInvalidLocation;
     TLinkedList<FInvalidLocationNodeType>* InvalidLocationsStart = nullptr;
 
     bool bOnInitialTag = true;
@@ -64,7 +64,7 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
         {
             for (int i = 0; i < ListenerList->Listeners.Num(); ++i)
             {
-                const auto Listener = ListenerList->Listeners[i];
+                const auto& Listener = ListenerList->Listeners[i];
                 if (Listener.IsValid())
                 {
                     if (bOnInitialTag || Listener.MatchMode == EBeeepChannelMatchMode::PartialMatch)
@@ -75,9 +75,10 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
                         }
                     }
                 }
-                else
+
+                if (!Listener.IsValid())
                 {
-                    auto InvalidLocation = MakeShared<FInvalidLocation>(ListenerList, Tag, i);
+                    FInvalidLocation InvalidLocation{ListenerList, Tag, i};
                     auto* InvalidLocationNode = new TLinkedList<FInvalidLocationNodeType>(InvalidLocation);
                     InvalidLocationNode->LinkHead(InvalidLocationsStart);
                     InvalidLocationsStart = InvalidLocationNode;
@@ -93,19 +94,19 @@ void UBeeepMessageSubsystem::BroadcastMessage(const FGameplayTag Channel, const 
         while (CurrentNode)
         {
             auto* NextNode = CurrentNode->Next();
-            auto& NodeData = **CurrentNode;
+            auto& [InvalidList, InvalidChannel, Index] = **CurrentNode;
 
-            if (NodeData->InvalidList)
+            if (InvalidList)
             {
-                NodeData->InvalidList->Listeners.RemoveAtSwap(NodeData->Index);
-                if (NodeData->InvalidList->Listeners.Num() == 0)
+                InvalidList->Listeners.RemoveAtSwap(Index);
+                if (InvalidList->Listeners.Num() == 0)
                 {
-                    ListenerMap.Remove(NodeData->InvalidChannel);
+                    ListenerMap.Remove(InvalidChannel);
                 }
             }
 
+            CurrentNode->Unlink();
             delete CurrentNode;
-            NodeData.Reset();
             CurrentNode = NextNode;
         }
         InvalidLocationsStart = nullptr;
