@@ -22,8 +22,6 @@ enum class EBeeepChannelMatchMode : uint8
     PartialMatch
 };
 
-using FBeeepMessageCallback = TFunction<void(FGameplayTag, const FInstancedStruct&)>;
-
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FBeeepMessageDelegate, FGameplayTag, Channel, const FInstancedStruct&, Payload);
 
 USTRUCT(BlueprintType)
